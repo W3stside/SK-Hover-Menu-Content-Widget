@@ -109,13 +109,13 @@ class sklop_Hover_Menu_Widget extends WP_Widget {
 				</div>
 				
 				<div class="col-md-4">	<!--First Column of Products-->
-					<ul class="testing-border">
+					<ul class="">
 						<?php
 							$args2 = array( 'post_type' => 'product', 'posts_per_page' => 5, 'product_cat' => $sklop_title_sluggified, 'orderby' => 'rand' );
 							$loop = new WP_Query( $args2 );
 							while ( $loop->have_posts() ) : $loop->the_post(); global $product; ?>
 							
-									<li class="product testing-border left-align HM_li_content">    
+									<li class="left-align HM_li_content">    
 										<a href="<?php echo get_permalink( $loop->post->ID ) ?>" title="<?php echo esc_attr($loop->post->post_title ? $loop->post->post_title : $loop->post->ID); ?>">
 											<span><?php the_title(); ?></span>                    
 										</a>
@@ -129,25 +129,29 @@ class sklop_Hover_Menu_Widget extends WP_Widget {
 				<div class="col-md-4"> 
 					
 					<?php
+						//Extracts ID from slug
 							$sklop_id_extractor = get_term_by( 'slug' , $sklop_title_sluggified , 'product_cat');
 							$sklop_id_from_slug = $sklop_id_extractor->term_id;
 					
 							$parent_cat_ID = $sklop_id_from_slug;
-							$args7 = array(
+							$args3 = array(
 							   'hierarchical' => 1,
 							   'show_option_none' => '',
 							   'hide_empty' => 0,
 							   'parent' => $parent_cat_ID,
 							   'taxonomy' => 'product_cat'
 							);
-						  $subcats = get_categories($args7);
-							echo '<ul class="wooc_sclist">';
-							  foreach ($subcats as $sc) {
-								$link = get_term_link( $sc->slug, $sc->taxonomy );
-								  echo '<li><a href="'. $link .'">'.$sc->name.'</a></li>';
+						  $sklop_subcats = get_categories($args3);
+					?>	  
+					<ul class="">
+					<?php
+							  foreach ($sklop_subcats as $sklop_subcat) {
+								$link = get_term_link( $sklop_subcat->slug, $sklop_subcat->taxonomy );
+				echo '<li class="left-align HM_li_content"><a href="'. $link .'">'.$sklop_subcat->name.'</a></li>';
 							  }
-							echo '</ul>';
-							
+					?>		  
+					</ul>
+					<?php		
 						
 						/*$terms = get_terms( 'product_cat' );
 						if ( ! empty( $terms ) && ! is_wp_error( $terms ) ){
