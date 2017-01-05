@@ -1,10 +1,10 @@
 <?php
 /**
 * Plugin Name: Hover Menu Content
-* Plugin URI: http://hatrackmedia.com
+* Plugin URI: http://spiderkitty.com
 * Description: A plugin that shows current product categories and tags in the Mega Menu
 * Author: David Sato
-* Author URI: http://hatrackmedia.com
+* Author URI: http://spiderkitty.com
 * Version: 0.0.1
 * License: GPLv2
 */
@@ -107,26 +107,8 @@ class sklop_Hover_Menu_Widget extends WP_Widget {
 					?>  
 					</div>
 				</div>
-				
-				<div class="col-md-4">	<!--First Column of Products-->
-					<ul class="">
-						<?php
-							$args2 = array( 'post_type' => 'product', 'posts_per_page' => 5, 'product_cat' => $sklop_title_sluggified, 'orderby' => 'rand' );
-							$loop = new WP_Query( $args2 );
-							while ( $loop->have_posts() ) : $loop->the_post(); global $product; ?>
-							
-									<li class="left-align HM_li_content">    
-										<a href="<?php echo get_permalink( $loop->post->ID ) ?>" title="<?php echo esc_attr($loop->post->post_title ? $loop->post->post_title : $loop->post->ID); ?>">
-											<span><?php the_title(); ?></span>                    
-										</a>
-									</li>
-									
-						<?php endwhile; ?>
-						<?php wp_reset_query(); ?>
-					</ul>
-				</div>
 
-				<div class="col-md-4"> 
+				<div class="col-md-8"> 
 					
 					<?php
 						//Extracts ID from slug
@@ -135,47 +117,39 @@ class sklop_Hover_Menu_Widget extends WP_Widget {
 					
 							$parent_cat_ID = $sklop_id_from_slug;
 							$args3 = array(
-							   'hierarchical' => 1,
-							   'show_option_none' => '',
-							   'hide_empty' => 0,
-							   'parent' => $parent_cat_ID,
-							   'taxonomy' => 'product_cat'
+								'taxonomy'         => 'product_cat',
+								'hierarchical'     => 1,
+							    'show_option_none' => '',
+							    'hide_empty'       => 0,
+							    'parent'           => $parent_cat_ID
 							);
-						  $sklop_subcats = get_categories($args3);
+							$sklop_subcats = get_categories($args3);
 					?>	  
-					<ul class="">
+					
 					<?php
-							  foreach ($sklop_subcats as $sklop_subcat) {
+							foreach ($sklop_subcats as $sklop_subcat) {	//loops through the subcategories as listed above ^^
 								$link = get_term_link( $sklop_subcat->slug, $sklop_subcat->taxonomy );
-				echo '<li class="left-align HM_li_content"><a href="'. $link .'">'.$sklop_subcat->name.'</a></li>';
+								
+								echo '<ul class="first_ul">'; 
+									echo '<li class="first-li left-align HM_li_content">';
+										echo '<a href="'. $link .'">'.$sklop_subcat->name.'</a>'; //echos the subcategory link
+										echo '<ul class="second_ul">';		
+										
+											$args4 = array( 'post_type' => 'product', 'posts_per_page' => 2, 'product_cat' => $sklop_subcat->slug );
+											$loop = new WP_Query( $args4 );
+											while ( $loop->have_posts() ) : $loop->the_post(); //new WP_Query loop to grab the 'Posts' which in this case = 'Products'
+											global $product;
+												
+												echo '<li class="indent_1 left-align HM_li_content"><a class="basic-text" href="'.get_permalink().'">'.get_the_title().'</a></li>';
+												
+											endwhile;
+											wp_reset_query();
+											
+										echo '</ul>';
+									echo '</li>';			
+								echo '</ul>';		
 							  }
-					?>		  
-					</ul>
-					<?php		
-						
-						/*$terms = get_terms( 'product_cat' );
-						if ( ! empty( $terms ) && ! is_wp_error( $terms ) ){
-							
-							foreach ( $terms as $term ) {
-								echo '<li>' . $term->name . '</li>';
-							}
-							
-						}
-
-						
-						/*$categories = get_terms( array(
-							'taxonomy' 		=> 'product_cat',
-							'hide_empty' 	=> true,
-							'order_by' 		=> 'name',
-							'order' 		=> 'ASC'
-						) );
-						foreach ($categories as $c) {
-							woocommerce_product_subcategories();
-							}
-						foreach ($cat_col_two as $cat_two) {
-							echo $cat_two;
-						} */?>
-						
+					?>		  					
 				</div>	
 				
 			</div>			
